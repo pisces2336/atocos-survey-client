@@ -2,7 +2,14 @@
   <v-container>
     <v-row>
       <v-col>
-        <h1>ようこそ、{{ user?.email }} さん！</h1>
+        <v-card>
+          <v-card-title> {{ user?.email }} さんのマイページ </v-card-title>
+          <v-spacer />
+          <v-card-text>
+            <v-btn color="blue">新しいアンケートを作成</v-btn>
+            <v-data-table :items="surveyList" @click:row="null" />
+          </v-card-text>
+        </v-card>
       </v-col>
     </v-row>
   </v-container>
@@ -15,6 +22,7 @@ import { onMounted, ref } from 'vue'
 const axiosStore = useAxiosStore()
 
 const user = ref<{ email: string }>()
+const surveyList = ref<{ title: string; description: string }[]>([])
 
 const getSendData = () => {
   return {
@@ -28,14 +36,17 @@ const getSendData = () => {
     `,
   }
 }
-
 onMounted(async () => {
   const sendData = getSendData()
   const res = await axiosStore.postGql(sendData)
-  console.log(res)
   if (!res) {
     return
   }
   user.value = res.data.me
+
+  surveyList.value = [
+    { title: 'タイトル１', description: '説明１' },
+    { title: 'タイトル２', description: '説明２' },
+  ]
 })
 </script>
