@@ -44,6 +44,8 @@ const login = async () => {
     alert('ログインに失敗しました')
     return
   }
+
+  window.location.href = '/mypage'
 }
 
 const onSubmit = async () => {
