@@ -7,7 +7,7 @@
           <v-spacer />
           <v-card-text>
             <v-btn color="blue" to="/surveys/new">新しいアンケートを作成</v-btn>
-            <v-data-table :items="surveyList" @click:row="null" />
+            <v-data-table :items="user?.surveys" @click:row="null" />
           </v-card-text>
         </v-card>
       </v-col>
@@ -17,19 +17,37 @@
 
 <script setup lang="ts">
 import { useAxiosStore } from '@/stores/axiosStore'
+import type { Survey } from '@/types/survey'
 import { onMounted, ref } from 'vue'
 
 const axiosStore = useAxiosStore()
 
-const user = ref<{ email: string }>()
-const surveyList = ref<{ title: string; description: string }[]>([])
+const user = ref<{ email: string; surveys: Survey[] }>()
 
 onMounted(async () => {
-  user.value = await axiosStore.getLoginUser()
-
-  surveyList.value = [
-    { title: 'タイトル１', description: '説明１' },
-    { title: 'タイトル２', description: '説明２' },
-  ]
+  _fetchData()
 })
+
+const _fetchData = async () => {
+  const query = _getQuery()
+  const res = await axiosStore.postGql({ query })
+  if (!res) {
+    return
+  }
+  user.value = res.data.me
+}
+
+const _getQuery = () => {
+  return `
+    query {
+      me {
+        email
+        surveys {
+          title
+          description
+        }
+      }
+    }
+  `
+}
 </script>
