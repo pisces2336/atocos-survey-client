@@ -6,6 +6,7 @@ export interface Survey {
 }
 
 export interface Question {
+  id?: string
   displayOrder?: number
   type: 'SingleSelection' | 'MultipleSelection' | 'FreeText'
   questionnaire: string

@@ -94,13 +94,11 @@ const onSubmit = async () => {
 const _getQuery = () => {
   return `
     mutation createSurvey(
-      $userId: String!
       $title: String!
       $description: String!
       $questions: [CreateQuestionInput!]!
     ) {
       createSurvey(createSurveyInput: {
-        userId: $userId
         title: $title
         description: $description
         questions: $questions
@@ -112,7 +110,6 @@ const _getQuery = () => {
 }
 
 const _getSurveyVariables = async () => {
-  const user = await axiosStore.getLoginUser()
   const formattedQuestions = questions.value.map((question, questionIdx) => {
     question.displayOrder = questionIdx
     if (['SingleSelection', 'MultipleSelection'].includes(question.type)) {
@@ -129,7 +126,6 @@ const _getSurveyVariables = async () => {
   })
 
   return {
-    userId: user.id,
     title: title.value,
     description: description.value,
     questions: formattedQuestions,

@@ -7,7 +7,7 @@
           <v-spacer />
           <v-card-text>
             <v-btn color="blue" to="/surveys/new">新しいアンケートを作成</v-btn>
-            <v-data-table :items="user?.surveys" @click:row="null" />
+            <v-data-table :items="surveys" @click:row="null" />
           </v-card-text>
         </v-card>
       </v-col>
@@ -23,6 +23,7 @@ import { onMounted, ref } from 'vue'
 const axiosStore = useAxiosStore()
 
 const user = ref<{ email: string; surveys: Survey[] }>()
+const surveys = ref<{ title: string; description: string }[]>([])
 
 onMounted(async () => {
   _fetchData()
@@ -35,18 +36,14 @@ const _fetchData = async () => {
     return
   }
   user.value = res.data.me
+  surveys.value = res.data.listSurvey
 }
 
 const _getQuery = () => {
   return `
     query {
-      me {
-        email
-        surveys {
-          title
-          description
-        }
-      }
+      me { email }
+      listSurvey { title description }
     }
   `
 }
