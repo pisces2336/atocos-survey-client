@@ -19,6 +19,12 @@ export const useAxiosStore = defineStore('axios', {
 
         return res.data
       } catch (e) {
+        // Internal Server Errorが出た場合は再読み込みさせる
+        if (axios.isAxiosError(e) && e.status === 500) {
+          alert('サーバーに接続できません。')
+          window.location.reload()
+        }
+
         console.error(e)
         return null
       }

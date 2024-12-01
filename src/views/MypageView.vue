@@ -6,7 +6,7 @@
           <v-card-title> {{ user?.email }} さんのマイページ </v-card-title>
           <v-spacer />
           <v-card-text>
-            <v-btn color="blue">新しいアンケートを作成</v-btn>
+            <v-btn color="blue" to="/surveys/new">新しいアンケートを作成</v-btn>
             <v-data-table :items="surveyList" @click:row="null" />
           </v-card-text>
         </v-card>
