@@ -24,25 +24,8 @@ const axiosStore = useAxiosStore()
 const user = ref<{ email: string }>()
 const surveyList = ref<{ title: string; description: string }[]>([])
 
-const getSendData = () => {
-  return {
-    query: `
-      query {
-        me {
-          id
-          email
-        }
-      }
-    `,
-  }
-}
 onMounted(async () => {
-  const sendData = getSendData()
-  const res = await axiosStore.postGql(sendData)
-  if (!res) {
-    return
-  }
-  user.value = res.data.me
+  user.value = await axiosStore.getLoginUser()
 
   surveyList.value = [
     { title: 'タイトル１', description: '説明１' },

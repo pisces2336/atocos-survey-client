@@ -80,5 +80,14 @@ export const useAxiosStore = defineStore('axios', {
         variables: { email, password },
       }
     },
+
+    async getLoginUser() {
+      const sendData = { query: 'query { me { id email }}' }
+      const res = await this.postGql(sendData)
+      if (!res) {
+        return
+      }
+      return res.data.me
+    },
   },
 })

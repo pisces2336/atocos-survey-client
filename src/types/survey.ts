@@ -1,17 +1,18 @@
 export interface Survey {
-  userId: string
+  userId?: string
   title: string
   description: string
   questions: Question[]
 }
 
 export interface Question {
-  displayOrder: number
+  displayOrder?: number
   type: 'SingleSelection' | 'MultipleSelection' | 'FreeText'
-  questionaire: string
+  questionnaire: string
   options: Option[]
 }
 
 export interface Option {
   label: string
+  displayOrder?: number
 }

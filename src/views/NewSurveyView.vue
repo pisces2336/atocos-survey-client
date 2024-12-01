@@ -3,7 +3,7 @@
     <v-row>
       <v-col>
         <v-card max-width="700px" class="mx-auto">
-          <v-form @submit.prevent="onSubmit">
+          <v-form v-model="formValid" @submit.prevent="onSubmit">
             <v-card-title class="d-flex">
               <span>アンケート新規作成</span>
               <v-spacer></v-spacer>
@@ -13,8 +13,22 @@
               <v-container>
                 <v-row>
                   <v-col>
-                    <v-text-field label="タイトル" v-model="title"></v-text-field>
-                    <v-textarea label="説明" v-model="description"></v-textarea>
+                    <v-text-field
+                      label="タイトル"
+                      v-model="title"
+                      :rules="[requiredRule]"
+                      hide-details
+                    ></v-text-field>
+                  </v-col>
+                </v-row>
+                <v-row>
+                  <v-col>
+                    <v-textarea
+                      label="説明"
+                      v-model="description"
+                      :rules="[requiredRule]"
+                      hide-details
+                    ></v-textarea>
                   </v-col>
                 </v-row>
                 <QuestionCardList />
@@ -35,28 +49,90 @@
 
 <script setup lang="ts">
 import QuestionCardList from '@/components/QuestionCardList.vue'
+import { useAxiosStore } from '@/stores/axiosStore'
 import { useSurveyStore } from '@/stores/surveyStore'
 import { storeToRefs } from 'pinia'
-import { onMounted } from 'vue'
+import { onMounted, ref } from 'vue'
+
+const axiosStore = useAxiosStore()
 
 const surveyStore = useSurveyStore()
 const { title, description, questions } = storeToRefs(surveyStore)
 
-const onSubmit = () => {
-  questions.value.forEach((v) => console.table(v))
-}
+const formValid = ref(false)
 
-const addQuestion = () => {
-  questions.value.push({
-    type: 'SingleSelection',
-    displayOrder: questions.value.length,
-    questionaire: '',
-    options: [{ label: '' }],
-  })
-}
+const requiredRule = (v: string) => !!v || '必須項目です'
 
 onMounted(() => {
   questions.value = []
   addQuestion()
 })
+
+const addQuestion = () => {
+  questions.value.push({
+    type: 'SingleSelection',
+    questionnaire: '',
+    options: [{ label: '' }],
+  })
+}
+
+const onSubmit = async () => {
+  if (!formValid.value) {
+    return
+  }
+
+  const query = _getQuery()
+  const variables = await _getSurveyVariables()
+  const res = await axiosStore.postGql({ query, variables })
+  if (!res) {
+    return
+  }
+
+  window.location.href = '/mypage'
+}
+
+const _getQuery = () => {
+  return `
+    mutation createSurvey(
+      $userId: String!
+      $title: String!
+      $description: String!
+      $questions: [CreateQuestionInput!]!
+    ) {
+      createSurvey(createSurveyInput: {
+        userId: $userId
+        title: $title
+        description: $description
+        questions: $questions
+      }) {
+        title
+      }
+    }
+  `
+}
+
+const _getSurveyVariables = async () => {
+  const user = await axiosStore.getLoginUser()
+  const formattedQuestions = questions.value.map((question, questionIdx) => {
+    question.displayOrder = questionIdx
+    if (['SingleSelection', 'MultipleSelection'].includes(question.type)) {
+      // 選択形式の場合は選択肢を整形
+      question.options = question.options.map((option, optionIdx) => {
+        option.displayOrder = optionIdx
+        return option
+      })
+    } else {
+      // 選択形式でない場合は選択肢を除去
+      question.options = []
+    }
+    return question
+  })
+
+  return {
+    userId: user.id,
+    title: title.value,
+    description: description.value,
+    questions: formattedQuestions,
+  }
+}
 </script>

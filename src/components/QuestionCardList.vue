@@ -6,12 +6,7 @@
           <v-card-text>
             <v-row>
               <v-col class="d-flex">
-                <v-radio-group
-                  v-model="question.type"
-                  inline
-                  hide-details
-                  @change="onchangeType(questionIdx)"
-                >
+                <v-radio-group v-model="question.type" inline hide-details>
                   <v-radio label="単一選択" value="SingleSelection" />
                   <v-radio label="複数選択" value="MultipleSelection" />
                   <v-radio label="自由記述" value="FreeText" />
@@ -28,7 +23,7 @@
               <v-col>
                 <v-text-field
                   label="質問文"
-                  v-model="question.questionaire"
+                  v-model="question.questionnaire"
                   :rules="[required]"
                   hide-details
                 />
@@ -113,11 +108,6 @@ const required = (v: string) => !!v || false
 
 const removeQuestion = (questionIdx: number) => {
   questions.value.splice(questionIdx, 1)
-}
-
-const onchangeType = (questionIdx: number) => {
-  questions.value[questionIdx].options = []
-  addOption(questionIdx)
 }
 
 const addOption = (questionIdx: number) => {
