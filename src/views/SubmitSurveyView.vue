@@ -4,7 +4,8 @@
       <v-col>
         <v-card :title="title" :subtitle="description" max-width="600px" class="mx-auto">
           <v-card-text>
-            <v-form v-model="formValid" @submit.prevent="onSubmit">
+            <template v-if="isAlreadySubmitted">既に回答済みです。</template>
+            <v-form v-else v-model="formValid" @submit.prevent="onSubmit">
               <template v-for="(question, questionIdx) of questions" :key="questionIdx">
                 <v-row>
                   <v-col>
@@ -65,6 +66,8 @@ import { useRoute } from 'vue-router'
 const route = useRoute()
 const axiosStore = useAxiosStore()
 
+const isAlreadySubmitted = ref(false)
+
 const title = ref('')
 const description = ref('')
 const questions = ref<Question[]>([])
@@ -73,16 +76,16 @@ const formValid = ref(false)
 const answers = ref<(string | string[])[]>([])
 
 onMounted(async () => {
-  if (await _isAlreadySubmitted()) {
+  isAlreadySubmitted.value = await _getIsAlreadySubmitted()
+  if (isAlreadySubmitted.value) {
     alert('既に回答済みです。')
-    window.location.href = '/'
     return
   }
 
   await _fetchData()
 })
 
-const _isAlreadySubmitted = async () => {
+const _getIsAlreadySubmitted = async () => {
   const query = `
     query getAlreadySubmitted($surveyId: String! $ipAddress: String!) {
       getAlreadySubmitted(surveyId: $surveyId ipAddress: $ipAddress)
@@ -158,7 +161,7 @@ const onSubmit = async () => {
     return
   }
 
-  window.location.href = '/'
+  window.location.href = '/surveys/submit/complete'
 }
 
 const _getSendQuery = () => {

@@ -17,7 +17,10 @@
             <template v-for="(question, idx) of survey?.questions" :key="question.id">
               <v-row>
                 <v-col>
-                  <v-card :title="question.questionnaire">
+                  <v-card
+                    :title="question.questionnaire"
+                    :subtitle="`回答者数：${question.answers.length}`"
+                  >
                     <template v-if="question.type === 'FreeText'">
                       <v-list class="w-50 mx-auto">
                         <v-list-item
@@ -32,6 +35,7 @@
                     <template v-else>
                       <Bar
                         :data="getChartData(question.options, question.answers)"
+                        :options="getChartOptions()"
                         class="w-50 mx-auto"
                         style="height: 200px"
                       />
@@ -48,12 +52,20 @@
 </template>
 <script setup lang="ts">
 import { useAxiosStore } from '@/stores/axiosStore'
-import { BarElement, CategoryScale, Chart as ChartJS, LinearScale, Title } from 'chart.js'
+import {
+  BarElement,
+  CategoryScale,
+  Chart as ChartJS,
+  LinearScale,
+  Title,
+  Tooltip,
+  type ChartOptions,
+} from 'chart.js'
 import { onMounted, ref } from 'vue'
 import { Bar } from 'vue-chartjs'
 import { useRoute } from 'vue-router'
 
-ChartJS.register(Title, BarElement, CategoryScale, LinearScale)
+ChartJS.register(Title, Tooltip, BarElement, CategoryScale, LinearScale)
 
 const route = useRoute()
 const axiosStore = useAxiosStore()
@@ -107,13 +119,42 @@ const getChartData = (options, answers) => {
   // 複数回答を平坦化する
   const answerItems = answers.map((ans) => ans.answerText.split(',')).flat()
 
-  // 回答数を集計
-  const data = labels.map((label) => answerItems.filter((ans) => ans === label).length)
+  // 回答数を百分率で集計
+  const rawData = labels.map((label) => answerItems.filter((ans) => ans === label).length)
+  const perData = rawData.map((data) => (data / answerItems.length) * 100)
 
   return {
     labels,
-    backgroundColor: '#000',
-    datasets: [{ data }],
+    datasets: [{ data: perData, rawData: rawData }],
+  }
+}
+
+const getChartOptions = (): ChartOptions => {
+  return {
+    responsive: true,
+    scales: {
+      y: {
+        max: 100,
+        ticks: {
+          callback: function (value) {
+            return value + '%'
+          },
+        },
+      },
+    },
+    plugins: {
+      tooltip: {
+        callbacks: {
+          label: function (context) {
+            const index = context.dataIndex
+            const num = context.dataset.data[index]
+            // @ts-expect-error rawDataを無理やり入れているため
+            const rawNum = context.dataset.rawData[index]
+            return `${num}% (${rawNum}人)`
+          },
+        },
+      },
+    },
   }
 }
 </script>
