@@ -76,6 +76,7 @@ const createUser = async () => {
     alert('ユーザーの作成に失敗しました')
     return
   }
+  return createRes
 }
 
 const login = async () => {
@@ -93,7 +94,11 @@ const onSubmit = async () => {
     return
   }
 
-  await createUser()
+  const res = await createUser()
+  if (!res) {
+    return
+  }
+
   await login()
 }
 </script>
