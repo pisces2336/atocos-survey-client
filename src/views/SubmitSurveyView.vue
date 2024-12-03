@@ -72,9 +72,32 @@ const questions = ref<Question[]>([])
 const formValid = ref(false)
 const answers = ref<(string | string[])[]>([])
 
-onMounted(() => {
-  _fetchData()
+onMounted(async () => {
+  if (await _isAlreadySubmitted()) {
+    alert('既に回答済みです。')
+    window.location.href = '/'
+    return
+  }
+
+  await _fetchData()
 })
+
+const _isAlreadySubmitted = async () => {
+  const query = `
+    query alreadySubmitted($ipAddress: String!) {
+      alreadySubmitted(ipAddress: $ipAddress)
+    }
+  `
+  const variables = { ipAddress: await _fetchIpAddress() }
+  const res = await axiosStore.postGql({ query, variables })
+  return res.data
+}
+
+// IPアドレスを用いて同一端末からの回答を制御する
+const _fetchIpAddress = async () => {
+  const res = await axios.post('https://ipinfo.io/')
+  return res.data.ip
+}
 
 const _fetchData = async () => {
   const query = _getQuery()
@@ -128,19 +151,31 @@ const onSubmit = async () => {
     return
   }
 
+  const query = _getSendQuery()
   const variables = await _getSendVariables()
-  console.log(variables)
+  const res = await axiosStore.postGql({ query, variables })
+  console.log(res.data)
 }
 
 const _getSendQuery = () => {
-  return ``
+  return `
+    mutation createSubmission(
+      $surveyId: String!
+      $ipAddress: String!
+      $answers: [CreateAnswerInput!]!
+    ) {
+      createSubmission( createSubmissionInput: {
+        surveyId: $surveyId
+        ipAddress: $ipAddress
+        answers: $answers
+      }) {
+        id
+      }
+    }
+  `
 }
 
 const _getSendVariables = async () => {
-  // 同一人物が複数回答できないようにするためipアドレスを記録する
-  const res = await axios.post('https://ipinfo.io/')
-  const ipAddress = res.data.ip
-
   const answersData = answers.value.map((ans, idx) => ({
     questionId: questions.value[idx].id,
     answerText: typeof ans === 'string' ? ans : ans.join(),
@@ -148,7 +183,7 @@ const _getSendVariables = async () => {
 
   return {
     surveyId: route.params['id'],
-    ipAddress: ipAddress,
+    ipAddress: _fetchIpAddress(),
     answers: answersData,
   }
 }
