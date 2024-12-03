@@ -84,7 +84,6 @@ const _fetchData = async () => {
   const query = _getQuery()
   const res = await axiosStore.postGql({ query, variables: { id } })
   survey.value = res.data.getSurvey
-  console.log(survey.value)
 }
 
 const _getQuery = () => {

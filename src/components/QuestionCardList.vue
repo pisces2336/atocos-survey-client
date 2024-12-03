@@ -117,7 +117,6 @@ const addOption = (questionIdx: number) => {
 }
 
 const removeOption = (questionIdx: number, optionIdx: number) => {
-  console.log(optionIdx)
   questions.value[questionIdx].options.splice(optionIdx, 1)
 }
 </script>

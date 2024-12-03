@@ -93,7 +93,6 @@ const _getIsAlreadySubmitted = async () => {
   `
   const variables = { surveyId: route.params['id'], ipAddress: await _fetchIpAddress() }
   const res = await axiosStore.postGql({ query, variables })
-  console.log(res.data.getAlreadySubmitted)
   return res.data.getAlreadySubmitted
 }
 
