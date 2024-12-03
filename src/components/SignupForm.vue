@@ -93,7 +93,7 @@ const onSubmit = async () => {
     return
   }
 
-  createUser()
-  login()
+  await createUser()
+  await login()
 }
 </script>
