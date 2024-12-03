@@ -18,7 +18,24 @@
               <v-row>
                 <v-col>
                   <v-card :title="question.questionnaire">
-                    <!-- 回答を集計して表示 -->
+                    <template v-if="question.type === 'FreeText'">
+                      <v-list class="w-50 mx-auto">
+                        <v-list-item
+                          v-for="(answer, ansIdx) of question.answers"
+                          :key="ansIdx"
+                          prepend-icon="mdi-circle"
+                        >
+                          {{ answer.answerText }}
+                        </v-list-item>
+                      </v-list>
+                    </template>
+                    <template v-else>
+                      <Bar
+                        :data="getChartData(question.options, question.answers)"
+                        class="w-50 mx-auto"
+                        style="height: 200px"
+                      />
+                    </template>
                   </v-card>
                 </v-col>
               </v-row>
@@ -31,11 +48,14 @@
 </template>
 <script setup lang="ts">
 import { useAxiosStore } from '@/stores/axiosStore'
+import { BarElement, CategoryScale, Chart as ChartJS, LinearScale, Title } from 'chart.js'
 import { onMounted, ref } from 'vue'
-import { useRoute, useRouter } from 'vue-router'
+import { Bar } from 'vue-chartjs'
+import { useRoute } from 'vue-router'
+
+ChartJS.register(Title, BarElement, CategoryScale, LinearScale)
 
 const route = useRoute()
-const router = useRouter()
 const axiosStore = useAxiosStore()
 
 const submissionPageUrl = ref('')
@@ -63,10 +83,37 @@ const _getQuery = () => {
         description
         questions {
           id
+          type
           questionnaire
+          options {
+            label
+          }
+          answers {
+            answerText
+          }
         }
       }
     }
   `
+}
+
+const getChartData = (options, answers) => {
+  // 選択肢のラベルを取得
+  const labels: string[] = []
+  for (const option of options) {
+    labels.push(option.label)
+  }
+
+  // 複数回答を平坦化する
+  const answerItems = answers.map((ans) => ans.answerText.split(',')).flat()
+
+  // 回答数を集計
+  const data = labels.map((label) => answerItems.filter((ans) => ans === label).length)
+
+  return {
+    labels,
+    backgroundColor: '#000',
+    datasets: [{ data }],
+  }
 }
 </script>
