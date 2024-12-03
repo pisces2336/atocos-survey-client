@@ -84,13 +84,14 @@ onMounted(async () => {
 
 const _isAlreadySubmitted = async () => {
   const query = `
-    query alreadySubmitted($ipAddress: String!) {
-      alreadySubmitted(ipAddress: $ipAddress)
+    query getAlreadySubmitted($surveyId: String! $ipAddress: String!) {
+      getAlreadySubmitted(surveyId: $surveyId ipAddress: $ipAddress)
     }
   `
-  const variables = { ipAddress: await _fetchIpAddress() }
+  const variables = { surveyId: route.params['id'], ipAddress: await _fetchIpAddress() }
   const res = await axiosStore.postGql({ query, variables })
-  return res.data
+  console.log(res.data.getAlreadySubmitted)
+  return res.data.getAlreadySubmitted
 }
 
 // IPアドレスを用いて同一端末からの回答を制御する
@@ -147,14 +148,17 @@ const requiredRule = (v: string | string[]) => {
 
 const onSubmit = async () => {
   if (!formValid.value) {
-    alert('sbmt')
     return
   }
 
   const query = _getSendQuery()
   const variables = await _getSendVariables()
   const res = await axiosStore.postGql({ query, variables })
-  console.log(res.data)
+  if (!res) {
+    return
+  }
+
+  window.location.href = '/'
 }
 
 const _getSendQuery = () => {
@@ -183,7 +187,7 @@ const _getSendVariables = async () => {
 
   return {
     surveyId: route.params['id'],
-    ipAddress: _fetchIpAddress(),
+    ipAddress: await _fetchIpAddress(),
     answers: answersData,
   }
 }

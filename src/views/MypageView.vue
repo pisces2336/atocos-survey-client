@@ -7,7 +7,7 @@
           <v-spacer />
           <v-card-text>
             <v-btn color="blue" to="/surveys/new">新しいアンケートを作成</v-btn>
-            <v-data-table :items="surveys" @click:row="null" />
+            <v-data-table :headers="headers" :items="surveys" @click:row="onClickRow" />
           </v-card-text>
         </v-card>
       </v-col>
@@ -25,6 +25,10 @@ const axiosStore = useAxiosStore()
 const user = ref<{ email: string; surveys: Survey[] }>()
 const surveys = ref<{ title: string; description: string }[]>([])
 
+const headers = [
+  { title: 'タイトル', key: 'title' },
+  { title: '説明', key: 'description' },
+]
 onMounted(async () => {
   _fetchData()
 })
@@ -43,8 +47,12 @@ const _getQuery = () => {
   return `
     query {
       me { email }
-      listSurvey { title description }
+      listSurvey { id title description }
     }
   `
+}
+
+const onClickRow = (_: unknown, data: { item: { id: string } }) => {
+  window.location.href = `/surveys/${data.item.id}`
 }
 </script>

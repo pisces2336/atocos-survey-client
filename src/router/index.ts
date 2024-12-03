@@ -3,6 +3,7 @@ import MypageView from '@/views/MypageView.vue'
 import NewSurveyView from '@/views/NewSurveyView.vue'
 import SignupView from '@/views/SignupView.vue'
 import SubmitSurveyView from '@/views/SubmitSurveyView.vue'
+import SurveyDetailView from '@/views/SurveyDetailView.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 
 const router = createRouter({
@@ -27,6 +28,10 @@ const router = createRouter({
     {
       path: '/surveys/new',
       component: NewSurveyView,
+    },
+    {
+      path: '/surveys/:id',
+      component: SurveyDetailView,
     },
     {
       path: '/surveys/submit/:id',
