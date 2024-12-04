@@ -107,6 +107,7 @@ const _fetchData = async () => {
   const variables = _getVariables()
   const res = await axiosStore.postGql({ query, variables })
   if (!res) {
+    alert('データが見つかりませんでした。')
     return
   }
 
@@ -157,6 +158,7 @@ const onSubmit = async () => {
   const variables = await _getSendVariables()
   const res = await axiosStore.postGql({ query, variables })
   if (!res) {
+    alert('回答の提出に失敗しました。')
     return
   }
 

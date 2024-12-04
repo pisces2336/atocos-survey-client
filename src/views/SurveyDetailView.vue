@@ -83,6 +83,10 @@ const _fetchData = async () => {
   const id = route.params['id']
   const query = _getQuery()
   const res = await axiosStore.postGql({ query, variables: { id } })
+  if (!res) {
+    alert('データが見つかりませんでした')
+    return
+  }
   survey.value = res.data.getSurvey
 }
 

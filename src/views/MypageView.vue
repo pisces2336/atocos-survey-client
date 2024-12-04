@@ -37,6 +37,7 @@ const _fetchData = async () => {
   const query = _getQuery()
   const res = await axiosStore.postGql({ query })
   if (!res) {
+    alert('データが見つかりませんでした。')
     return
   }
   user.value = res.data.me
