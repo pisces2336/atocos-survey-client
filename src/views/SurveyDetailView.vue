@@ -124,7 +124,11 @@ const getChartData = (options, answers) => {
 
   // 回答数を百分率で集計
   const rawData = labels.map((label) => answerItems.filter((ans) => ans === label).length)
-  const perData = rawData.map((data) => (data / answerItems.length) * 100)
+  const perData = rawData.map((data) => {
+    // 百分率表示の小数第2位までで丸める
+    const floatNum = (data / answerItems.length) * 100
+    return Math.round(floatNum * 100) / 100
+  })
 
   return {
     labels,
