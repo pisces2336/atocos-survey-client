@@ -106,7 +106,7 @@ const _fetchData = async () => {
   const variables = _getVariables()
   const res = await axiosStore.postGql({ query, variables })
   if (!res) {
-    alert('データが見つかりませんでした。')
+    alert('データの取得に失敗しました。')
     return
   }
 

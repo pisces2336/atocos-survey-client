@@ -23,7 +23,8 @@ export const useAxiosStore = defineStore('axios', {
         if (axios.isAxiosError(e) && e.status === 500) {
           alert('サーバーに接続できません。')
           window.location.reload()
-        }
+          return
+        } 
 
         console.error(e)
         return null

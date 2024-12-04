@@ -85,6 +85,7 @@ const onSubmit = async () => {
   const variables = await _getSurveyVariables()
   const res = await axiosStore.postGql({ query, variables })
   if (!res) {
+    alert('アンケートの作成に失敗しました。')
     return
   }
 
