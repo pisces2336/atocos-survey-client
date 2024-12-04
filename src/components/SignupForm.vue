@@ -1,27 +1,36 @@
 <template>
   <v-card title="ユーザー登録" max-width="500" class="mx-auto">
     <v-card-text>
-      <v-form v-model="formValid" @submit.prevent="onSubmit">
-        <v-text-field
-          label="メールアドレス"
-          type="email"
-          v-model="email"
-          :rules="[requiredRule, emailRule]"
-        />
-        <v-text-field
-          label="パスワード"
-          type="password"
-          v-model="password"
-          :rules="[requiredRule]"
-        />
-        <v-text-field
-          label="パスワード（再入力）"
-          type="password"
-          v-model="passwordConfirmation"
-          :rules="[requiredRule, passwordConfirmRule]"
-        />
-        <v-btn color="green" type="submit" width="80%" class="d-block mx-auto">送信</v-btn>
-      </v-form>
+      <v-row>
+        <v-col>
+          <v-form v-model="formValid" @submit.prevent="onSubmit">
+            <v-text-field
+              label="メールアドレス"
+              type="email"
+              v-model="email"
+              :rules="[requiredRule, emailRule]"
+            />
+            <v-text-field
+              label="パスワード"
+              type="password"
+              v-model="password"
+              :rules="[requiredRule]"
+            />
+            <v-text-field
+              label="パスワード（再入力）"
+              type="password"
+              v-model="passwordConfirmation"
+              :rules="[requiredRule, passwordConfirmRule]"
+            />
+            <v-btn color="green" type="submit" width="80%" class="d-block mx-auto">送信</v-btn>
+          </v-form>
+        </v-col>
+      </v-row>
+      <v-row>
+        <v-col class="text-center">
+          <v-btn href="/login" variant="text" class="mx-auto">アカウントをお持ちの方はこちら</v-btn>
+        </v-col>
+      </v-row>
     </v-card-text>
   </v-card>
 </template>
