@@ -11,7 +11,6 @@
                   <v-col>
                     <v-card :title="question.questionnaire">
                       <v-card-text>
-                        {{ answers[questionIdx] }}
                         <template v-if="question.type === 'SingleSelection'">
                           <v-radio-group v-model="answers[questionIdx]" :rules="[requiredRule]">
                             <v-radio
